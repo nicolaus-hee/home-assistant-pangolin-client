@@ -1,0 +1,37 @@
+name: Pangolin Client
+version: "0.1.0"
+slug: pangolin_client
+description: Connects Home Assistant to private Pangolin resources via the official pangolin-cli tunnel client
+url: https://github.com/fosrl/cli
+arch:
+  - amd64
+  - aarch64
+init: false
+stage: experimental
+host_network: true
+devices:
+  - /dev/net/tun
+privileged:
+  - NET_ADMIN
+  - NET_RAW
+map:
+  - data:rw
+options:
+  endpoint: "https://app.pangolin.net"
+  client_id: ""
+  client_secret: ""
+  org_id: ""
+  auto_update: true
+  pinned_version: ""
+  log_level: "info"
+schema:
+  endpoint: url
+  client_id: str
+  client_secret: password
+  org_id: str?
+  auto_update: bool
+  pinned_version: str?
+  log_level: list(debug|info|warn|error)
+  # aliases: str? — disabled, see run.sh: the DNS takeover this fed into is
+  # blocked by an unrelated Supervisor bug and has no visible effect right
+  # now, so it's commented out rather than shown as a working option.

@@ -1,0 +1,57 @@
+#include <tunables/global>
+
+profile pangolin_client flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/ssl_certs>
+
+  # run.sh entrypoint and the tools it calls (curl, jq, dig, iptables, bash).
+  # /run.sh itself needs an explicit rule: it's the ENTRYPOINT, executed via
+  # its shebang, not just an argument to an already-permitted interpreter.
+  /run.sh rix,
+  /bin/** ix,
+  /usr/bin/** ix,
+  /sbin/** ix,
+  /usr/lib/bashio/** ix,
+
+  # pangolin-cli binary, downloaded into /data at runtime (not a fixed path
+  # baked into the image, so it needs its own explicit exec rule)
+  /data/** rw,
+  /data/pangolin-cli mrix,
+
+  # pangolin-cli's own state/log directory (its DNS watchdog process writes
+  # a log file here). mkdir mediates each path component as its own literal
+  # target, so the intermediate directory levels each need their own rule,
+  # not just a single "/root/.config/pangolin/** rw" covering the leaves.
+  /root/.config/ rw,
+  /root/.config/pangolin/ rw,
+  /root/.config/pangolin/logs/ rw,
+  /root/.config/pangolin/** rw,
+
+  # /etc/resolv.conf is rewritten directly by pangolin-cli's file-based DNS
+  # configurator (confirmed live: no bind-mount/namespace trick involved,
+  # unlike Tailscale's MagicDNS fix, which is why this profile does not need
+  # capability sys_admin or any mount rule)
+  /etc/resolv.conf rw,
+  /etc/resolv.conf.olm.backup rw,
+
+  # iptables lock file for the DNS DNAT takeover rules
+  /run/xtables.lock rwk,
+
+  # the pangolin TUN interface
+  /dev/net/tun rw,
+
+  # route/interface setup and the DNAT rules both go through netlink; AppArmor's
+  # network mediation can't usefully scope this further than by family
+  network,
+
+  /proc/net/** r,
+  /proc/sys/net/** rw,
+
+  capability net_admin,
+  capability net_raw,
+  capability dac_override,
+
+  signal (send) set=(term,int,kill),
+
+  /tmp/** rwk,
+}

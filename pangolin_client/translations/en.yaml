@@ -1,0 +1,25 @@
+configuration:
+  endpoint:
+    name: Pangolin Endpoint
+    description: Base URL of your Pangolin server.
+  client_id:
+    name: Client ID
+    description: Machine credential ID from your Pangolin site.
+  client_secret:
+    name: Client Secret
+    description: Machine credential secret for the Client ID above.
+  org_id:
+    name: Organization ID
+    description: Optional, only needed if your account has multiple organizations.
+  auto_update:
+    name: Auto-update pangolin-cli
+    description: Check for a newer pangolin-cli release on every start.
+  pinned_version:
+    name: Pinned Version
+    description: >-
+      Optional, e.g. 0.10.0. Pins pangolin-cli to that exact release and overrides
+      Auto-update entirely while set.
+  log_level:
+    name: Log Level
+    description: Verbosity of pangolin-cli's own log output.
+  # aliases: disabled, see config.yaml/run.sh — no visible effect right now.

@@ -1,0 +1,8 @@
+# Never commit local test credentials/secrets
+test-options.json
+*.local.json
+.env
+.env.*
+
+# Internal Claude dev notes — contain private IPs/hostnames, not for public repo
+CLAUDE.md
